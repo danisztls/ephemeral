@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+#
+# Unitary tests for Ephemeral 
+#
+# @author: Daniel Souza <me at posix dot dev dot br>
+# @license: GPLv3
+
+# Utils 
+# -----
+reset='\e[0;0m'
+italic='\e[3m'
+blink='\e[5m'
+red='\e[1;31m'
+green='\e[1;32m'
+
+# Lib
+# ---
+# Diff two strings
+_diff() {
+  # use delta if available
+  if command -v delta &>/dev/null; then
+    delta <(echo "$expected") <(echo "$observed")
+
+  else
+    # FIXME: Working on shell but not on script (maybe zsh only)
+    # diff --color=always -d <(<<< "$expected") <(<<< "$observed")
+    diff --color=always -d <(echo "$expected") <(echo "$observed")
+  fi
+}
+
+# Print a report of the test
+_report() {
+  local status="$1"
+
+  if [ "$status" -eq 0 ]; then
+    hits+=1
+    printf "[${green}PASS${reset}]: %s\n" "'$cmd'"
+
+  elif [ "$status" -eq 1 ]; then
+    misses+=1
+    printf "[${red}FAIL${reset}]: %s\n" "'$cmd'"
+    _diff
+
+  else
+    printf "${red}ERROR: Wrong status code for %s.${reset}\n" "$cmd"
+  fi
+}
+
+# Check if observations pass expectations
+_test() {
+  local expected observed
+  observed="$($cmd)" # read stdout of command to variable
+  expected="$(< "./test/${name}.txt")" # read contents of file to variable
+
+  if [ "$observed" = "$expected" ]; then
+    _report 0
+  else
+    _report 1
+    mkdir -p "test-debug"
+    echo "$observed" > "test-debug/${name}.txt" 
+  fi
+}
+
+# Tests
+# -----
+# Create testing environment
+_populate() {
+  local _program_dir="$EPHEMERAL_SRC/config/program"
+
+  rm -rf ".test"
+
+  mkdir -p "$_program_dir"
+  mkdir "$_program_dir/Cache/"
+  mkdir "$_program_dir/Code Cache/"
+  mkdir "$_program_dir/donotdelthisdir/"
+  touch "$_program_dir/donotdelthisfile"
+}
+
+_testEphemeral() {
+  local name="ephemeral"
+  local cmd="ephemeral && ls $EPHEMERAL_DST"
+  _test
+}
+
+# Main 
+# ----
+# check if in the desired dir
+[ -a "ephemeral" ] || exit 1
+
+export EPHEMERAL_SRC="./.test/src" EPHEMERAL_DST="./.test/dst"
+
+_populate
+
+declare -i hits misses total
+hits=0
+misses=0
+total=0
+
+printf "${italic}%s${blink}%s${reset}\n\n" "Running tests" "..."
+
+# _testEphemeral
+
+# Show summary
+total="$(( hits + misses ))"
+printf "\nHIT: ${green}%i${reset} of %i\n" "$hits" "$total"
+printf "MISS: ${red}%i${reset} of %i\n" "$misses" "$total"
+
+# Exit w/ error if there are any misses
+if [ $misses -gt 0 ]; then
+  exit 1
+fi
