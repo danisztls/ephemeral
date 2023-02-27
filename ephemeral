@@ -63,10 +63,14 @@ _link() {
   local _dst_parent="${_dst%/*}"
 
   if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
-    mkdir -p "$_dst_parent"
-    rm -rf "$_dst" 
-    mv "$_src" "$_dst_parent"
-    ln -s "$_dst" "$_src"
+    if [ -h "$_src" ]; then
+      printf "%s is already a symlink, ignoring it" "$_src"
+    else
+      mkdir -p "$_dst_parent"
+      rm -rf "$_dst" 
+      mv "$_src" "$_dst_parent"
+      ln -s "$_dst" "$_src"
+    fi
   else
     printf "link %s to %s\n" "$_src" "$_dst"
   fi
