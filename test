@@ -50,14 +50,14 @@ _report() {
 _test() {
   local expected observed
   observed="$($cmd)" # read stdout of command to variable
-  expected="$(< "./test/${name}.txt")" # read contents of file to variable
+  expected="$(< "testing/expected/${name}.txt")" # read contents of file to variable
 
   if [ "$observed" = "$expected" ]; then
     _report 0
   else
     _report 1
-    mkdir -p "test-debug"
-    echo "$observed" > "test-debug/${name}.txt" 
+    mkdir -p "testing/debug"
+    echo "$observed" > "testing/debug/${name}.txt" 
   fi
 }
 
@@ -65,11 +65,13 @@ _test() {
 # -----
 # Create testing environment
 _populate() {
-  local _program_dir="$EPHEMERAL_SRC/config/program"
+  local _program_dir="$EPHEMERAL_SRC/.config/program"
 
-  rm -rf ".test"
+  rm -rf "testing/src"
+  rm -rf "testing/dst"
 
   mkdir -p "$_program_dir"
+  mkdir "$_program_dir/blob_storage/"
   mkdir "$_program_dir/Cache/"
   mkdir "$_program_dir/Code Cache/"
   mkdir "$_program_dir/donotdelthisdir/"
@@ -77,8 +79,8 @@ _populate() {
 }
 
 _testEphemeral() {
-  local name="ephemeral"
-  local cmd="ephemeral && ls $EPHEMERAL_DST"
+  local name="./ephemeral"
+  local cmd="./ephemeral 1>/dev/null && ls $EPHEMERAL_DST"
   _test
 }
 
@@ -87,7 +89,7 @@ _testEphemeral() {
 # check if in the desired dir
 [ -a "ephemeral" ] || exit 1
 
-export EPHEMERAL_SRC="./.test/src" EPHEMERAL_DST="./.test/dst"
+export EPHEMERAL_SRC="testing/src" EPHEMERAL_DST="testing/dst"
 
 _populate
 
@@ -98,7 +100,7 @@ total=0
 
 printf "${italic}%s${blink}%s${reset}\n\n" "Running tests" "..."
 
-# _testEphemeral
+_testEphemeral
 
 # Show summary
 total="$(( hits + misses ))"
