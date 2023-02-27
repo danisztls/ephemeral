@@ -11,17 +11,9 @@
 
 # Utils
 # -----
-# Debug
-# verbosity, prints shell input lines as they are read
-# set -v
-
 # exit when a command has a non-zero exit status
 # note: '||:' at the end of a pipe mask a non-zero exit
 set -e
-
-# exit when referencing undefined variable
-# note: $* and $@ are exceptions
-# set -u
 
 # exit if any command in a pipe fail
 set -o pipefail
@@ -76,7 +68,7 @@ _link() {
     mv "$_src" "$_dst_parent"
     ln -s "$_dst" "$_src"
   else
-    printf "%s to %s\n" "$_src" "$_dst"
+    printf "link %s to %s\n" "$_src" "$_dst"
   fi
 }
 
@@ -108,7 +100,8 @@ _link_chromium() {
 # Main
 # ----
 if [ "$EPHEMERAL_DEBUG" == "true" ]; then
-  set -x  # enable
+  set -v
+  set -x
 fi
 
 _link_chromium
