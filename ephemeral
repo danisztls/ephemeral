@@ -43,8 +43,8 @@ for prog in "${deps[@]}"; do
   fi
 done
 
-# Main
-# ----
+# Config
+# -----
 # Read settings from exported variables
 
 if [ "$EPHEMERAL_SRC" ]; then
@@ -59,6 +59,8 @@ else
   dst_dir="$XDG_RUNTIME_DIR/ephemeral-cache"
 fi
 
+# Main
+# ----
 # Init destination dir
 mkdir -p "$dst_dir"
 
@@ -71,7 +73,6 @@ _link() {
   if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
     mkdir -p "$_dst_parent"
     rm -rf "$_dst" 
-    # rm -rf "$_src"
     mv "$_src" "$_dst_parent"
     ln -s "$_dst" "$_src"
   else
@@ -95,8 +96,10 @@ _link_chromium() {
       printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
 
       for dir in "${_chromium_cache_dirs[@]}"; do
-        printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
-        _link "$root/$dir"
+        if [ -a "$root/$dir" ]; then
+          printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
+          _link "$root/$dir"
+        fi
       done
     fi
   done
