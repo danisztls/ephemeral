@@ -96,7 +96,7 @@ _link_chromium() {
       printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
 
       for dir in "${_chromium_cache_dirs[@]}"; do
-        if [ -a "$root/$dir" ]; then
+        if [ -a "$src_dir/$root/$dir" ]; then
           printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
           _link "$root/$dir"
         fi
