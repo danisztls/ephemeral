@@ -1,0 +1,4 @@
+[1;34m
+Linking Chromium instance... [1;39m.config/program[0;0m
+[1;33mlinking... [1;39mCache[0;0m
+[1;33mlinking... [1;39mCachedData[0;0m
