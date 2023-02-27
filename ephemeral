@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Link cache files and other ephemeral files to $XDG_RUNTIME_DIR
-
+#
 # @author: Daniel Souza <me at posix dot dev dot br>
 # @license: GPLv3
 # @usage:
@@ -25,7 +25,7 @@ set -e
 
 # exit when referencing undefined variable
 # note: $* and $@ are exceptions
-set -u
+# set -u
 
 # exit if any command in a pipe fail
 set -o pipefail
@@ -39,7 +39,7 @@ blue="\e[1;34m"
 strong="\e[1;39m"
 
 # Dependencies
-deps=()
+deps=(fd)
 for prog in "${deps[@]}"; do
   if [ ! "$(command -v "$prog")" ]; then
     printf "${red}Required dependency not found: ${strong}%s${reset}\n" "$prog"
@@ -47,20 +47,61 @@ for prog in "${deps[@]}"; do
   fi
 done
 
-# OptArgs
-_getOpts() {
-  while getopts "ab:" option; do
-    case $option in
-      a) testFlag="true";;
-      b) testVar="$OPTARG";;
-      *) echo "Not a valid argument."
-    esac
+# Main
+# ----
+# Read settings from exported variables
+
+if [ "$EPHEMERAL_SRC" ]; then
+  src_dir="$EPHEMERAL_SRC"
+else
+  src_dir="$HOME"
+fi
+
+if [ "$EPHEMERAL_DST" ]; then
+  dst_dir="$EPHEMERAL_DST"
+else
+  dst_dir="$XDG_RUNTIME_DIR/ephemeral-cache"
+fi
+
+# Init destination dir
+mkdir -p "$dst_dir"
+
+# Link source path to destination dir
+_link() {
+  local _src="$src_dir/$1"
+  local _dst="$dst_dir/$1"
+  local _dst_parent="${_dst%/*}"
+
+  if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
+    mkdir -p "$_dst_parent"
+    rm -rf "$_dst" 
+    # rm -rf "$_src"
+    mv "$_src" "$_dst_parent/"
+    ln -s "$_dst" "$_src"
+  else
+    printf "%s to %s\n" "$_src" "$_dst"
+  fi
+}
+
+# TODO: Parallelize using semaphore
+# Find and link chromium instances cache dirs
+_link_chromium() {
+  # Find directories with chromium signature
+  _chromium_root_dirs=$(fd --type d --base-directory "$src_dir" --unrestricted "blob_storage" --exclude "Trash/" |\
+                        sed 's|/blob_storage/||')
+
+  mapfile -t _chromium_root_dirs <<< "$_chromium_root_dirs"
+
+  _chromium_cache_dirs=("Cache" "CachedData" "CachedExtensions" "Code Cache" "GPUCache")
+
+  for root in "${_chromium_root_dirs[@]}"; do
+    printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
+
+    for dir in "${_chromium_cache_dirs[@]}"; do
+      printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
+      _link "$root/$dir"
+    done
   done
 }
 
-# slice arguments as getopts don't work with mixed parameters/arguments
-# e.g. script.sh target -a
-_getOpts "${@:2}"  # 2nd to nth
-
-# Main
-# ----
+_link_chromium
