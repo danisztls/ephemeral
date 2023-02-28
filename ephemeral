@@ -58,13 +58,14 @@ mkdir -p "$dst_dir"
 
 # Link source path to destination dir
 _link() {
-  local _src="$src_dir/$1"
-  local _dst="$dst_dir/$1"
+  local _src="$src_dir/$root/$dir"
+  local _dst="$dst_dir/$root/$dir"
   local _dst_parent="${_dst%/*}"
 
   if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
     if [ -h "$_src" ]; then
       printf "%s is already a symlink, ignoring it" "$_src"
+    
     else
       mkdir -p "$_dst_parent"
       rm -rf "$_dst" 
@@ -75,6 +76,7 @@ _link() {
         mv "$_src" "$_dst_parent"
       fi
 
+      printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
       ln -s "$_dst" "$_src"
     fi
   else
@@ -93,14 +95,17 @@ _link_chromium() {
 
   _chromium_cache_dirs=("Cache" "CachedData" "CachedExtensions" "Code Cache" "GPUCache")
 
-  for root in "${_chromium_root_dirs[@]}"; do
+  for _root in "${_chromium_root_dirs[@]}"; do
+    local root="$_root"
+
     if [ "$root" ]; then
       printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
 
-      for dir in "${_chromium_cache_dirs[@]}"; do
+      for _dir in "${_chromium_cache_dirs[@]}"; do
+        local dir="$_dir"
+
         if [ -a "$src_dir/$root/$dir" ]; then
-          printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
-          _link "$root/$dir"
+          _link
         fi
       done
     fi
