@@ -86,7 +86,7 @@ _link() {
 # Find and link chromium instances cache dirs
 _link_chromium() {
   # Find directories with chromium signature
-  _chromium_root_dirs=$(fd --type d --base-directory "$src_dir" --unrestricted "blob_storage" --exclude "Trash/" |\
+  _chromium_root_dirs=$(fd --type d --base-directory "$src_dir" --unrestricted "blob_storage" --exclude "Trash/" --exclude "ephemeral/testing" |\
                         sed 's|/blob_storage/||')
 
   mapfile -t _chromium_root_dirs <<< "$_chromium_root_dirs"
