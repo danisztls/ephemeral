@@ -58,8 +58,8 @@ mkdir -p "$dst_dir"
 
 # Link source path to destination dir
 _link() {
-  local _src="$src_dir/$root/$dir"
-  local _dst="$dst_dir/$root/$dir"
+  local _src="$src_dir/$root/$cache"
+  local _dst="$dst_dir/$root/$cache"
   local _dst_parent="${_dst%/*}"
 
   if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
@@ -76,7 +76,7 @@ _link() {
         mv "$_src" "$_dst_parent"
       fi
 
-      printf "${yellow}linking... ${strong}%s${reset}\n" "$dir"
+      printf "${yellow}linking... ${strong}%s${reset}\n" "$cache"
       ln -s "$_dst" "$_src"
     fi
   else
@@ -101,10 +101,10 @@ _link_chromium() {
     if [ "$root" ]; then
       printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
 
-      for _dir in "${_chromium_cache_dirs[@]}"; do
-        local dir="$_dir"
+      for _cache in "${_chromium_cache_dirs[@]}"; do
+        local cache="$_cache"
 
-        if [ -a "$src_dir/$root/$dir" ]; then
+        if [ -a "$src_dir/$root/$cache" ]; then
           _link
         fi
       done
