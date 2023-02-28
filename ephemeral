@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Link cache files and other ephemeral files to $XDG_RUNTIME_DIR
+# Link caches from Chromium/Electron instances to ephemeral caches at $XDG_RUNTIME_DIR
 #
 # @author: Daniel Souza <me at posix dot dev dot br>
 # @license: GPLv3
-# @usage:
-# @deps:
+# @usage: ephemeral
+# @deps: fd
 
 # shellcheck disable=SC2034
 
