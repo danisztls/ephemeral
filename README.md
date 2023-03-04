@@ -35,3 +35,7 @@ Be warned that this script can permanently remove data due to bugs not yet disco
 The default max size of the dir is 10% of RAM _(might be different on your system)_ which can be insufficient, specially if moving old caches instead of removing then.
 
 To increase the limit edit `RuntimeDirectorySize` on `/etc/systemd/logind.conf`.
+
+### I don't want to store files at RAM
+
+Then just set `EPHEMERAL_DST` to something else. e.g. `$XDG_CACHE_HOME/ephemeral-cache`.
