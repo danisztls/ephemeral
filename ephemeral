@@ -51,6 +51,14 @@ else
   dst_dir="$XDG_RUNTIME_DIR/ephemeral-cache"
 fi
 
+if ! [ "$EPHEMERAL_VERBOSITY" == "true" ]; then 
+  if [ -t 0 ]; then
+    EPHEMERAL_VERBOSITY=true
+  else
+    EPHEMERAL_VERBOSITY=false
+  fi
+fi
+
 # Main
 # ----
 # Init destination dir
@@ -76,7 +84,10 @@ _link() {
         mv "$_src" "$_dst_parent"
       fi
 
-      printf "${yellow}linking... ${strong}%s${reset}\n" "$cache"
+      if  [ "$EPHEMERAL_VERBOSITY" == "true" ]; then 
+        printf "${yellow}linking... ${strong}%s${reset}\n" "$cache"
+      fi
+
       ln -s "$_dst" "$_src"
     fi
   else
@@ -101,7 +112,9 @@ _link_chromium() {
     local root="$_root"
 
     if [ "$root" ]; then
-      printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
+      if  [ "$EPHEMERAL_VERBOSITY" == "true" ]; then 
+        printf "${blue}\nLinking Chromium instance... ${strong}%s${reset}\n" "$root"
+      fi
 
       for _cache in "${_chromium_cache_dirs[@]}"; do
         local cache="$_cache"
