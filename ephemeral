@@ -72,7 +72,7 @@ _link() {
 
   if ! [ "$EPHEMERAL_DRY_RUN" == "true" ]; then 
     if [ -h "$_src" ]; then
-      printf "%s is already a symlink, ignoring it" "$_src"
+      printf "%s is already a symlink, ignoring it\n" "$_src"
     
     else
       # remove existing
