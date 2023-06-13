@@ -106,7 +106,7 @@ _link_chromium() {
 
   mapfile -t _chromium_root_dirs <<< "$_chromium_root_dirs"
 
-  _chromium_cache_dirs=("Cache" "CachedData" "CachedExtensions" "Code Cache" "GPUCache")
+  _chromium_cache_dirs=("Cache" "CachedData" "CachedExtensions" "Code Cache" "DawnCache" "GPUCache")
 
   for _root in "${_chromium_root_dirs[@]}"; do
     local root="$_root"
