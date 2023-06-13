@@ -75,13 +75,19 @@ _link() {
       printf "%s is already a symlink, ignoring it" "$_src"
     
     else
-      mkdir -p "$_dst_parent"
+      # remove existing
       rm -rf "$_dst" 
+
+      # create parent dir
+      mkdir -p "$_dst_parent"
       
-      if [ "$EPHEMERAL_REMOVE_SRC" ]; then
-        rm -rf "$_src"
-      else
-        mv "$_src" "$_dst_parent"
+      # move or remove source
+      if [ -a "$_src" ]; then
+        if [ "$EPHEMERAL_REMOVE_SRC" ]; then
+          rm -rf "$_src"
+        else
+          mv "$_src" "$_dst_parent"
+        fi
       fi
 
       if  [ "$EPHEMERAL_VERBOSITY" == "true" ]; then 
@@ -121,10 +127,7 @@ _link_chromium() {
 
       for _cache in "${_chromium_cache_dirs[@]}"; do
         local cache="$_cache"
-
-        if [ -a "$src_dir/$root/$cache" ]; then
-          _link
-        fi
+        _link
       done
     fi
   done
