@@ -27,13 +27,15 @@ blue="\e[1;34m"
 strong="\e[1;39m"
 
 # Dependencies
-deps=(fd)
-for prog in "${deps[@]}"; do
-  if [ ! "$(command -v "$prog")" ]; then
-    printf "${red}Required dependency not found: ${strong}%s${reset}\n" "$prog"
-    exit 1
-  fi
-done
+# NOTE: fd is fdfind in Debian-based distros
+if [ "$(command -v "fdfind")" ]; then
+  fd_cmd="fdfind"
+elif [ "$(command -v "fd")" ]; then 
+  fd_cmd="fd"
+else
+  echo -e "${red}Required dependency sharkdp/fd not found${reset}\n"
+  exit 1
+fi
 
 # Config
 # -----
@@ -105,7 +107,7 @@ _link() {
 # Find and link chromium instances cache dirs
 _link_chromium() {
   # Find directories with chromium signature
-  _chromium_root_dirs="$(fd --type d \
+  _chromium_root_dirs="$($fd_cmd --type d \
     --base-directory "$src_dir" \
     --unrestricted blob_storage \
     --exclude "**/Trash/" \
