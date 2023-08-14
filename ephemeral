@@ -29,9 +29,9 @@ strong="\e[1;39m"
 # Dependencies
 # NOTE: fd is fdfind in Debian-based distros
 if [ "$(command -v "fdfind")" ]; then
-  fd_cmd="fdfind"
+  _fd="fdfind"
 elif [ "$(command -v "fd")" ]; then 
-  fd_cmd="fd"
+  _fd="fd"
 else
   echo -e "${red}Required dependency sharkdp/fd not found${reset}\n"
   exit 1
@@ -107,7 +107,7 @@ _link() {
 # Find and link chromium instances cache dirs
 _link_chromium() {
   # Find directories with chromium signature
-  _chromium_root_dirs="$($fd_cmd --type d \
+  _chromium_root_dirs="$($_fd --type d \
     --base-directory "$src_dir" \
     --unrestricted blob_storage \
     --exclude "**/Trash/" \
