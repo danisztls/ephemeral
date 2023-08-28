@@ -50,8 +50,10 @@ fi
 if [ "$EPHEMERAL_DST" ]; then
   dst_dir="$EPHEMERAL_DST"
 else
-  dst_dir="$XDG_RUNTIME_DIR/ephemeral-cache"
+  dst_dir="$XDG_CACHE_HOME"
 fi
+
+dst_dir="$dst_dir/ephemeral-cache"
 
 if ! [ "$EPHEMERAL_VERBOSITY" == "true" ]; then 
   if [ -t 0 ]; then
