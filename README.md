@@ -2,6 +2,8 @@
 
 Chromium is a big offender of [XDG Base Directory specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) and sprawled a numerous dynasty of Electron apps that inherited this problem. The issue is that Chromium and Electron apps inconsistently store cache files alongside configuration making them difficult to manage and archive.
 
+Chromium frequently writes to disk even on [inactivity](https://issues.chromium.org/issues/40302223).
+
 ## Use Cases
 
 This script finds cache files under the user directory that are outside the expected cache directory, moves them to `$XDG_CACHE_HOME` and create symbolic links in their previous paths. This works around [Chromium](https://bugs.chromium.org/p/chromium/issues/detail?id=129861) and [Electron](https://github.com/electron/electron/issues/8124) deficiencies. 
